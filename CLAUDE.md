@@ -21,3 +21,4 @@ This is a private index of legal and judicial people and law firms in Cullman Co
 - Never supply a value from memory, search snippets or inference. Every observation needs the URL it came from.
 - Push only to branches named `claude/*`. Never push to `main`.
 - Raw downloaded pages go in `raw/` (gitignored) and are deleted after parsing.
+- `leads/` stays local (gitignored). A lead is never a fact; promote it only through an ingest CSV that cites the article.

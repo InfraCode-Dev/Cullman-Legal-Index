@@ -15,6 +15,7 @@ pub fn validate(repo: &Repo, allow: &Allowlist, base: Option<&str>) -> Vec<Strin
     check_schema_version(repo, &mut errs);
     check_registry(repo, &mut errs);
     check_observations(repo, allow, &mut errs);
+    check_leads(repo, &mut errs);
     if let Some(b) = base {
         if let Err(e) = check_append_only(repo, b, &mut errs) {
             errs.push(format!("append-only check failed to run: {e}"));
@@ -186,7 +187,7 @@ fn check_observations(repo: &Repo, allow: &Allowlist, errs: &mut Vec<String>) {
 /// Observation files may only be added, never modified, renamed or deleted.
 fn check_append_only(repo: &Repo, base: &str, errs: &mut Vec<String>) -> Result<()> {
     let out = Command::new("git")
-        .args(["diff", "--name-status", "--no-renames", base, "--", "observations/"])
+        .args(["diff", "--name-status", "--no-renames", base, "--", "observations/", "leads/"])
         .current_dir(&repo.root)
         .output()?;
     if !out.status.success() {
@@ -197,8 +198,30 @@ fn check_append_only(repo: &Repo, base: &str, errs: &mut Vec<String>) -> Result<
         let status = parts.next().unwrap_or("");
         let path = parts.next().unwrap_or("");
         if status != "A" && path.ends_with(".jsonl") {
-            errs.push(format!("{path}: observation files are append-only (git status {status})"));
+            errs.push(format!("{path}: observation and lead files are append-only (git status {status})"));
         }
     }
     Ok(())
+}
+
+fn check_leads(repo: &Repo, errs: &mut Vec<String>) {
+    match crate::collect::load_leads(&repo.root) {
+        Err(e) => errs.push(format!("leads: {e:#}")),
+        Ok(files) => {
+            for (file, leads) in files {
+                let runs: BTreeSet<&str> = leads.iter().map(|l| l.run.as_str()).collect();
+                if runs.len() > 1 {
+                    errs.push(format!("{file}: one lead file must hold exactly one run"));
+                }
+                for (i, l) in leads.iter().enumerate() {
+                    if l.v != SCHEMA_VERSION {
+                        errs.push(format!("{file}:{}: schema version {}", i + 1, l.v));
+                    }
+                    if !l.url.starts_with("https://") {
+                        errs.push(format!("{file}:{}: lead url must be https", i + 1));
+                    }
+                }
+            }
+        }
+    }
 }

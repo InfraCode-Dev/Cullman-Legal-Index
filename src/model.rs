@@ -198,6 +198,8 @@ impl Repo {
         write_csv(&r("registry/orgs.csv"), &self.orgs, &["id", "kind", "name", "jurisdiction_id"])?;
         write_csv(&r("registry/persons.csv"), &self.persons, &["id", "name", "name_variants"])?;
         write_csv(&r("registry/tenures.csv"), &self.tenures, &["id", "person_id", "org_id", "post_id", "role"])?;
+        write_csv(&r("registry/posts.csv"), &self.posts, &["id", "org_id", "title", "place", "selection", "jurisdiction_id"])?;
+        write_csv(&r("registry/external_ids.csv"), &self.external_ids, &["entity_id", "scheme", "value", "first_seen", "last_seen"])?;
         Ok(())
     }
 

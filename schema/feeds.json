@@ -1,0 +1,73 @@
+{
+  "_comment": "WordPress REST sources polled by `lidx collect-feeds`. Results become local leads for review (leads/ is gitignored), never facts. Recheck the Governor URL after the January 2027 inauguration.",
+  "default_lookback_days": 14,
+  "per_request_delay_ms": 1500,
+  "sources": [
+    {
+      "name": "governor",
+      "posts_url": "https://governor.alabama.gov/wp-json/wp/v2/posts",
+      "terms": [
+        "Cullman",
+        "judicial appointment",
+        "district attorney",
+        "circuit judge",
+        "district judge"
+      ],
+      "require_any": [
+        "Cullman",
+        "32nd Judicial Circuit"
+      ]
+    },
+    {
+      "name": "cullman-tribune",
+      "posts_url": "https://www.cullmantribune.com/wp-json/wp/v2/posts",
+      "terms": [
+        "attorney",
+        "judge",
+        "law firm",
+        "district attorney",
+        "sheriff",
+        "municipal court",
+        "obituary attorney"
+      ],
+      "require_any": [],
+      "title_terms": [
+        "attorney",
+        "judge",
+        "law firm",
+        "lawyer",
+        "district attorney",
+        "sheriff",
+        "court",
+        "probate",
+        "magistrate",
+        "bar association"
+      ]
+    },
+    {
+      "name": "cullman-times",
+      "posts_url": "https://cullmantimes.com/wp-json/wp/v2/posts",
+      "terms": [
+        "attorney",
+        "judge",
+        "law firm",
+        "district attorney",
+        "sheriff",
+        "municipal court"
+      ],
+      "require_any": [],
+      "title_terms": [
+        "attorney",
+        "judge",
+        "law firm",
+        "lawyer",
+        "district attorney",
+        "sheriff",
+        "court",
+        "probate",
+        "magistrate",
+        "bar association"
+      ]
+    }
+  ]
+}
