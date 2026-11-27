@@ -59,7 +59,13 @@ pub fn civic(repo: &Repo, facts: &Facts) -> Civic {
         let mut search = o.name.clone();
         for p in &posts {
             post_count += 1;
-            let title = if p.place.is_empty() { p.title.clone() } else { format!("{}, {}", p.title, p.place) };
+            let title = if p.place.is_empty() {
+                p.title.clone()
+            } else if p.place.chars().all(|c| c.is_ascii_digit()) {
+                format!("{}, Place {}", p.title, p.place)
+            } else {
+                format!("{}, {}", p.title, p.place)
+            };
             let mut holders: Vec<(String, String)> = Vec::new();
             for t in repo.tenures.iter().filter(|t| t.post_id == p.id) {
                 let te = format!("tenure:{}", t.id);
