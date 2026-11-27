@@ -164,13 +164,14 @@ nav button {{ font:inherit; font-size:14px; padding:6px 12px; border-radius:999p
 nav button[aria-selected="true"] {{ background:var(--ink); color:var(--bg); border-color:var(--ink); }}
 .holders {{ list-style:none; padding:0; margin:4px 0 8px; }} .holders li {{ margin:4px 0; }}
 input {{ width:100%; padding:10px 12px; font:inherit; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); }}
+main[hidden] {{ display:none; }}
 main {{ padding:16px; display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }}
 .card {{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }}
 .card.stale {{ opacity:.62; }}
 .card h2 {{ font-size:17px; margin:0 0 4px; }}
 .card p {{ margin:6px 0; }}
 .meta {{ color:var(--muted); font-size:14px; }}
-.links a {{ color:var(--neu); }}
+a {{ color:var(--neu); }}
 .badge {{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; margin:0 4px 4px 0; }}
 .badge.ok {{ background:var(--okbg); color:var(--ok); }} .badge.warn {{ background:var(--warnbg); color:var(--warn); }} .badge.neutral {{ background:var(--neubg); color:var(--neu); }}
 .sales {{ border-top:1px dashed var(--line); margin-top:8px; padding-top:6px; }}
