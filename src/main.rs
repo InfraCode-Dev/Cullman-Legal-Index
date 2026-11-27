@@ -2,10 +2,14 @@
 
 mod allowlist;
 mod build;
+mod collect;
 mod ingest;
+mod ingest_more;
 mod model;
 mod render;
+mod runs;
 mod validate;
+mod views;
 
 use anyhow::{bail, Result};
 use clap::{Parser, Subcommand};
@@ -42,6 +46,23 @@ enum Cmd {
         /// Date the sources were read (YYYY-MM-DD).
         #[arg(long)]
         at: String,
+    },
+    /// Ingest a reviewed public-offices CSV (orgs, posts, holders) as one new observation file.
+    IngestOffices {
+        csv: PathBuf,
+        /// Date the sources were read (YYYY-MM-DD).
+        #[arg(long)]
+        at: String,
+    },
+    /// Ingest reviewed bar credential lookups for people already in the registry.
+    IngestBar { csv: PathBuf },
+    /// Refresh mail, SPF and DMARC facts for every firm with a website.
+    CollectDns,
+    /// Poll the news feeds in schema/feeds.json and write new posts as leads for review.
+    CollectFeeds {
+        /// Start date (YYYY-MM-DD); defaults to the newest lead per source.
+        #[arg(long)]
+        since: Option<String>,
     },
     /// Create an empty local sales database outside the repo.
     SalesInit { path: PathBuf },
@@ -91,14 +112,13 @@ fn main() -> Result<()> {
                 Some(p) => Some(render::load_sales(p)?),
                 None => None,
             };
-            fs::write(root.join("build/firms.html"), render::render(&rows, sales_map.as_ref()))?;
+            let civic = views::civic(&repo, &facts);
+            fs::write(root.join("build/firms.html"), render::render(&rows, sales_map.as_ref(), &civic))?;
             let current = facts.values().flatten().filter(|a| a.is_current).count();
             println!("built: {} firms, {} current facts; wrote build/index.db, data/firms.csv, build/firms.html", rows.len(), current);
         }
         Cmd::IngestFirms { csv, at } => {
-            if root.join("PAUSED").exists() {
-                bail!("PAUSED file present; collection is paused");
-            }
+            runs::ensure_not_paused(&root)?;
             chrono::NaiveDate::parse_from_str(&at, "%Y-%m-%d")?;
             let mut repo = model::Repo::load(&root)?;
             let allow = allowlist::Allowlist::load(&root)?;
@@ -108,6 +128,32 @@ fn main() -> Result<()> {
             for n in s.notes {
                 println!("note: {n}");
             }
+        }
+        Cmd::IngestOffices { csv, at } => {
+            runs::ensure_not_paused(&root)?;
+            chrono::NaiveDate::parse_from_str(&at, "%Y-%m-%d")?;
+            let mut repo = model::Repo::load(&root)?;
+            let allow = allowlist::Allowlist::load(&root)?;
+            let o = ingest_more::ingest_offices(&mut repo, &allow, &csv, &at)?;
+            report(&root, &o.file, o.observations, &o.notes);
+        }
+        Cmd::IngestBar { csv } => {
+            runs::ensure_not_paused(&root)?;
+            let mut repo = model::Repo::load(&root)?;
+            let allow = allowlist::Allowlist::load(&root)?;
+            let o = ingest_more::ingest_bar(&mut repo, &allow, &csv)?;
+            report(&root, &o.file, o.observations, &o.notes);
+        }
+        Cmd::CollectDns => {
+            let repo = model::Repo::load(&root)?;
+            let (file, n, notes) = collect::collect_dns(&repo)?;
+            report(&root, &file, n, &notes);
+        }
+        Cmd::CollectFeeds { since } => {
+            let since = since.map(|s| chrono::NaiveDate::parse_from_str(&s, "%Y-%m-%d")).transpose()?;
+            let repo = model::Repo::load(&root)?;
+            let (file, n, notes) = collect::collect_feeds(&repo, since)?;
+            report(&root, &file, n, &notes);
         }
         Cmd::SalesInit { path } => {
             if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
@@ -120,4 +166,11 @@ fn main() -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn report(root: &std::path::Path, file: &std::path::Path, n: usize, notes: &[String]) {
+    println!("wrote {} ({n} records)", file.strip_prefix(root).unwrap_or(file).display());
+    for note in notes {
+        println!("note: {note}");
+    }
 }

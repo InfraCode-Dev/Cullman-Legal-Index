@@ -65,7 +65,7 @@ fn badge(label: &str, value: &str, good: &[&str], bad: &[&str]) -> String {
     format!("<span class=\"badge {cls}\">{} {}</span>", esc(label), esc(v))
 }
 
-pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>) -> String {
+pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>, civic: &crate::views::Civic) -> String {
     let today = Utc::now().date_naive();
     let mut cards = String::new();
     for r in rows {
@@ -150,7 +150,7 @@ pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>)
     format!(
         r#"<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cullman Law Firms</title>
+<title>Cullman Legal Index</title>
 <style>
 :root {{ --bg:#f7f6f3; --card:#ffffff; --ink:#1d1d1b; --muted:#6b6b66; --line:#e3e1db; --ok:#1f7a4d; --okbg:#e5f4e4; --warn:#9a3b12; --warnbg:#f9ece7; --neu:#3d4f7a; --neubg:#e7f1fb; }}
 @media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{ --bg:#151513; --card:#1f1f1c; --ink:#ecebe6; --muted:#a3a29b; --line:#33322e; --ok:#7fd3a3; --okbg:#1c3327; --warn:#f0a37f; --warnbg:#3a2219; --neu:#a9c1f0; --neubg:#1d2a40; }} }}
@@ -159,14 +159,19 @@ pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>)
 body {{ margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; }}
 header {{ padding:16px; position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line); }}
 h1 {{ font-size:20px; margin:0 0 8px; }}
+nav {{ display:flex; gap:6px; margin:0 0 10px; flex-wrap:wrap; }}
+nav button {{ font:inherit; font-size:14px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; }}
+nav button[aria-selected="true"] {{ background:var(--ink); color:var(--bg); border-color:var(--ink); }}
+.holders {{ list-style:none; padding:0; margin:4px 0 8px; }} .holders li {{ margin:4px 0; }}
 input {{ width:100%; padding:10px 12px; font:inherit; border:1px solid var(--line); border-radius:8px; background:var(--card); color:var(--ink); }}
+main[hidden] {{ display:none; }}
 main {{ padding:16px; display:grid; gap:12px; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); }}
 .card {{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }}
 .card.stale {{ opacity:.62; }}
 .card h2 {{ font-size:17px; margin:0 0 4px; }}
 .card p {{ margin:6px 0; }}
 .meta {{ color:var(--muted); font-size:14px; }}
-.links a {{ color:var(--neu); }}
+a {{ color:var(--neu); }}
 .badge {{ display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; margin:0 4px 4px 0; }}
 .badge.ok {{ background:var(--okbg); color:var(--ok); }} .badge.warn {{ background:var(--warnbg); color:var(--warn); }} .badge.neutral {{ background:var(--neubg); color:var(--neu); }}
 .sales {{ border-top:1px dashed var(--line); margin-top:8px; padding-top:6px; }}
@@ -175,14 +180,26 @@ details {{ font-size:13px; color:var(--muted); margin-top:8px; }} details ul {{ 
   .notes {{ font-size:13px; color:var(--muted); }}
 footer {{ padding:0 16px 24px; color:var(--muted); font-size:13px; }}
 </style></head>
-<body><header><h1>Cullman law firms ({count})</h1><input id="q" type="search" placeholder="Filter by firm, attorney or practice" aria-label="Filter"></header>
-<main id="cards">{cards}</main>
-<footer>Built {today}. Dimmed cards were last confirmed more than 90 days ago. {sales_note}</footer>
+<body><header><h1>Cullman legal index</h1>
+<nav role="tablist"><button role="tab" data-tab="firms" aria-selected="true">Firms ({count})</button><button role="tab" data-tab="offices" aria-selected="false">Offices ({posts})</button><button role="tab" data-tab="people" aria-selected="false">People ({people})</button></nav>
+<input id="q" type="search" placeholder="Filter by name, firm, office or practice" aria-label="Filter"></header>
+<main id="firms" class="panel">{cards}</main>
+<main id="offices" class="panel" hidden>{offices}</main>
+<main id="people" class="panel" hidden>{people_html}</main>
+<footer>Built {today}. Dimmed firm cards were last confirmed more than 90 days ago. Bar status is a civic reference and never feeds sales. {sales_note}</footer>
 <script>
-const q=document.getElementById('q');q.addEventListener('input',()=>{{const t=q.value.toLowerCase();document.querySelectorAll('.card').forEach(c=>{{c.style.display=c.dataset.search.includes(t)?'':'none';}});}});
+const q=document.getElementById('q');
+function filt(){{const t=q.value.toLowerCase();document.querySelectorAll('.card').forEach(c=>{{c.style.display=c.dataset.search.includes(t)?'':'none';}});}}
+q.addEventListener('input',filt);
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{{document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==b.dataset.tab);try{{localStorage.setItem('tab',b.dataset.tab)}}catch(e){{}}}}));
+try{{const t=localStorage.getItem('tab');if(t){{const b=document.querySelector('[data-tab="'+t+'"]');if(b)b.click();}}}}catch(e){{}}
 </script></body></html>
 "#,
         count = rows.len(),
+        posts = civic.posts,
+        people = civic.people,
+        offices = civic.offices_html,
+        people_html = civic.people_html,
         cards = cards,
         today = today,
         sales_note = if sales.is_some() { "Includes local sales notes: do not share this file." } else { "Civic facts only; no sales data." }

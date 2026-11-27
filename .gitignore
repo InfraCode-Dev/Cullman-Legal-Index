@@ -6,3 +6,4 @@
 *.db-journal
 data/incoming/*
 !data/incoming/.gitkeep
+/leads

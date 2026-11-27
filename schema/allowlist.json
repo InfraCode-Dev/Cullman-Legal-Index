@@ -1,60 +1,192 @@
 {
   "_comment": "Per-source field allowlist. The validator rejects any observation whose field is not listed for its source and entity kind, and any field named in forbidden_fields or sales_fields. Edit only by reviewed pull request.",
   "forbidden_fields": [
-    "home_address", "residence", "personal_phone", "cell_phone", "mobile_phone",
-    "email", "personal_email", "spouse", "dependents", "children", "parents",
-    "siblings", "household_income", "income_range", "date_of_birth", "age"
+    "home_address",
+    "residence",
+    "personal_phone",
+    "cell_phone",
+    "mobile_phone",
+    "email",
+    "personal_email",
+    "spouse",
+    "dependents",
+    "children",
+    "parents",
+    "siblings",
+    "household_income",
+    "income_range",
+    "date_of_birth",
+    "age"
   ],
   "sales_fields": [
-    "next_action", "last_touch", "contact_log", "do_not_contact", "decision_unit",
-    "incumbent_it", "insurance_renewal_month", "questionnaire_pressure",
-    "conversation_notes", "incident_history", "succession_signal", "referral_hubs"
+    "next_action",
+    "last_touch",
+    "contact_log",
+    "do_not_contact",
+    "decision_unit",
+    "incumbent_it",
+    "insurance_renewal_month",
+    "questionnaire_pressure",
+    "conversation_notes",
+    "incident_history",
+    "succession_signal",
+    "referral_hubs"
   ],
   "sources": {
     "firm-table": {
       "org": [
-        "name", "office_address", "city", "office_phone", "website", "entity_type",
-        "sos_entity_id", "formation_date", "attorney_count", "practice_areas",
-        "closings", "mx_provider", "spf", "dmarc_policy", "places_place_id",
-        "confirmed_by", "notes"
+        "name",
+        "office_address",
+        "city",
+        "office_phone",
+        "website",
+        "entity_type",
+        "sos_entity_id",
+        "formation_date",
+        "attorney_count",
+        "practice_areas",
+        "closings",
+        "mx_provider",
+        "spf",
+        "dmarc_policy",
+        "places_place_id",
+        "confirmed_by",
+        "notes"
       ],
-      "person": ["name"],
-      "tenure": ["role", "status"]
+      "person": [
+        "name"
+      ],
+      "tenure": [
+        "role",
+        "status"
+      ]
     },
     "court-site": {
-      "org": ["name", "office_address", "city", "office_phone", "website"],
-      "person": ["name"],
-      "tenure": ["role", "status", "valid_from", "valid_to"]
+      "org": [
+        "name",
+        "office_address",
+        "city",
+        "office_phone",
+        "website"
+      ],
+      "person": [
+        "name"
+      ],
+      "tenure": [
+        "role",
+        "status",
+        "valid_from",
+        "valid_to"
+      ]
     },
     "agenda": {
-      "person": ["name"],
-      "tenure": ["role", "status", "valid_from", "valid_to"]
+      "person": [
+        "name"
+      ],
+      "tenure": [
+        "role",
+        "status",
+        "valid_from",
+        "valid_to"
+      ]
     },
     "governor-newsroom": {
-      "person": ["name"],
-      "tenure": ["role", "status", "valid_from", "valid_to"]
+      "person": [
+        "name"
+      ],
+      "tenure": [
+        "role",
+        "status",
+        "valid_from",
+        "valid_to"
+      ]
     },
     "bar-lookup": {
-      "person": ["name", "bar_status", "admit_date", "law_school", "firm_name_listed", "city_of_record", "discipline_page_id"]
+      "person": [
+        "name",
+        "bar_status",
+        "admit_date",
+        "law_school",
+        "firm_name_listed",
+        "city_of_record",
+        "discipline_page_id"
+      ]
     },
     "bar-discipline": {
-      "person": ["discipline_date", "discipline_type", "discipline_page_id"]
+      "person": [
+        "discipline_date",
+        "discipline_type",
+        "discipline_page_id"
+      ]
     },
     "sos-entity": {
-      "org": ["name", "entity_type", "sos_entity_id", "formation_date", "principal_office_city", "status"]
+      "org": [
+        "name",
+        "entity_type",
+        "sos_entity_id",
+        "formation_date",
+        "principal_office_city",
+        "status"
+      ]
     },
     "ethics-sei": {
-      "person": ["office_held", "filing_year", "own_business_positions"]
+      "person": [
+        "office_held",
+        "filing_year",
+        "own_business_positions"
+      ]
     },
     "dns": {
-      "org": ["mx_provider", "spf", "dmarc_policy"]
+      "org": [
+        "mx_provider",
+        "spf",
+        "dmarc_policy"
+      ]
     },
     "manual": {
-      "org": ["name", "office_address", "city", "office_phone", "website", "notes"],
-      "person": ["name", "notes"],
-      "tenure": ["role", "status", "valid_from", "valid_to"]
+      "org": [
+        "name",
+        "office_address",
+        "city",
+        "office_phone",
+        "website",
+        "notes"
+      ],
+      "person": [
+        "name",
+        "notes"
+      ],
+      "tenure": [
+        "role",
+        "status",
+        "valid_from",
+        "valid_to"
+      ]
+    },
+    "news": {
+      "person": [
+        "name"
+      ],
+      "tenure": [
+        "role",
+        "status",
+        "valid_from",
+        "valid_to"
+      ]
     }
   },
-  "address_fields": ["office_address"],
-  "residential_markers": ["county road", "co rd", "co. rd", "cr ", "rural route", "rr ", "hwy", "highway", "po box"]
+  "address_fields": [
+    "office_address"
+  ],
+  "residential_markers": [
+    "county road",
+    "co rd",
+    "co. rd",
+    "cr ",
+    "rural route",
+    "rr ",
+    "hwy",
+    "highway",
+    "po box"
+  ]
 }
