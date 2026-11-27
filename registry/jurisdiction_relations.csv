@@ -1,0 +1,7 @@
+child_id,parent_id,relation,valid_from,valid_to
+jur-cullman-county,jur-al,within,,
+jur-al-circuit-32,jur-cullman-county,serves,,
+jur-city-cullman,jur-cullman-county,within,,
+jur-hanceville,jur-cullman-county,within,,
+jur-alnd-ne,jur-alnd,within,,
+jur-alnd-ne,jur-cullman-county,serves,,

@@ -1,0 +1,8 @@
+/target
+/build
+/raw
+/sales
+*.db
+*.db-journal
+data/incoming/*
+!data/incoming/.gitkeep

@@ -1,0 +1,30 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Unit tests
+        run: cargo test --locked
+      - name: Validate (append-only against the base branch)
+        if: github.event_name == 'pull_request'
+        run: cargo run --locked --quiet -- validate --base origin/${{ github.base_ref }}
+      - name: Validate
+        if: github.event_name == 'push'
+        run: cargo run --locked --quiet -- validate
+      - name: Build
+        run: cargo run --locked --quiet -- build
+      - name: Generated firm table is committed and current
+        run: git diff --exit-code -- data/firms.csv

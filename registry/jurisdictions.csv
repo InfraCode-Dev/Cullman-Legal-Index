@@ -1,0 +1,8 @@
+id,kind,name,fips
+jur-al,state,Alabama,01
+jur-cullman-county,county,Cullman County,01043
+jur-al-circuit-32,circuit,32nd Judicial Circuit,
+jur-city-cullman,municipality,City of Cullman,
+jur-hanceville,municipality,Hanceville,
+jur-alnd,federal_district,Northern District of Alabama,
+jur-alnd-ne,federal_division,Northeastern Division (Huntsville),
