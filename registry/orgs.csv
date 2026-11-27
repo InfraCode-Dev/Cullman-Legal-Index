@@ -37,3 +37,12 @@ id,kind,name,jurisdiction_id
 01M8FEM82GM88BF35MT6WVPVRK,firm,"Sullivan Law Associates, LLC",jur-cullman-county
 01M8FEM82GBM78RR60YJ8V6N58,firm,Shared office: Sara Baker and Katie B. Ford,jur-cullman-county
 01M8FEM82G9AV5T80JJ8CZAXW7,office,Cullman County District Attorney's Office,jur-cullman-county
+01M8FJFGQ54E4Z1QX1HTMRCZ86,court,Circuit Court of Cullman County (32nd Judicial Circuit),jur-al-circuit-32
+01M8FJFGQ67ZB3HCP8YPBV06B9,court,District Court of Cullman County,jur-cullman-county
+01M8FJFGQ7EFW4C5XP2S5BTM3X,office,Cullman County Circuit Clerk,jur-cullman-county
+01M8FJFGQ7CKA5P77Q3HH5RZJM,court,Cullman County Probate Court,jur-cullman-county
+01M8FJFGQ9G4EZNBDKCBRCQCM0,court,City of Cullman Municipal Court,jur-city-cullman
+01M8FJFGQ969FEHATGWRBFQB7V,office,City of Cullman,jur-city-cullman
+01M8FJFGQASZP9S1CM8YXGH5P9,office,Cullman County Commission,jur-cullman-county
+01M8FJFGQAMV1BQ2Y706AAHKNG,agency,Cullman County Sheriff's Office,jur-cullman-county
+01M8FJFGQBR7RTV8T073VTPGJ9,agency,Cullman Police Department,jur-city-cullman
