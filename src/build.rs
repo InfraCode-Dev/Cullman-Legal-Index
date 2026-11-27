@@ -119,7 +119,7 @@ pub fn current<'a>(facts: &'a Facts, entity: &str, field: &str) -> Option<&'a As
 pub const FIRM_COLUMNS: &[&str] = &[
     "id", "name", "office_address", "city", "office_phone", "website", "entity_type",
     "sos_entity_id", "formation_date", "attorney_count", "attorneys", "practice_areas",
-    "closings", "mx_provider", "spf", "dmarc_policy", "confirmed_by", "sources", "last_confirmed",
+    "closings", "mx_provider", "spf", "dmarc_policy", "confirmed_by", "notes", "sources", "last_confirmed",
 ];
 
 /// Attorneys currently listed at an org, from tenures whose current status is incumbent.

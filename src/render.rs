@@ -56,12 +56,12 @@ fn esc(s: &str) -> String {
 fn badge(label: &str, value: &str, good: &[&str], bad: &[&str]) -> String {
     let cls = if good.contains(&value) {
         "ok"
-    } else if bad.contains(&value) || value.is_empty() {
+    } else if bad.contains(&value) {
         "warn"
     } else {
         "neutral"
     };
-    let v = if value.is_empty() { "unknown" } else { value };
+    let v = if value.is_empty() { "not checked" } else { value };
     format!("<span class=\"badge {cls}\">{} {}</span>", esc(label), esc(v))
 }
 
@@ -79,6 +79,9 @@ pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>)
             esc(&format!("{} {} {}", r["name"], r["attorneys"], r["practice_areas"]).to_lowercase())
         );
         c += &format!("<h2>{}</h2>", esc(&r["name"]));
+        if r["notes"].starts_with("DOUBTFUL") {
+            c += "<p class=\"badges\"><span class=\"badge warn\">Unconfirmed: call first</span></p>";
+        }
         let addr = if r["office_address"].is_empty() { r["city"].clone() } else { r["office_address"].clone() };
         c += &format!("<p class=\"meta\">{}</p>", esc(&addr));
         let mut links = Vec::new();
@@ -97,8 +100,11 @@ pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>)
         c += &badge("Mail", &r["mx_provider"], &[], &["none"]);
         c += &badge("DMARC", &r["dmarc_policy"], &["reject", "quarantine"], &["none", "missing"]);
         c += "</p>";
-        let count = if r["attorney_count"].is_empty() { attorneys.len().to_string() } else { r["attorney_count"].clone() };
-        c += &format!("<p><strong>Attorneys ({})</strong> {}</p>", esc(&count), esc(&attorneys.join(", ")));
+        if attorneys.is_empty() {
+            c += "<p><strong>Attorneys</strong> <span class=\"meta\">not listed on a firm site</span></p>";
+        } else {
+            c += &format!("<p><strong>Attorneys ({})</strong> {}</p>", attorneys.len(), esc(&attorneys.join(", ")));
+        }
         if !r["practice_areas"].is_empty() {
             c += &format!("<p><strong>Practice</strong> {}</p>", esc(&r["practice_areas"].replace(';', ",")));
         }
@@ -125,11 +131,17 @@ pub fn render(rows: &[BTreeMap<&'static str, String>], sales: Option<&SalesMap>)
                 }
             })
             .collect();
+        let notes = if r["notes"].is_empty() {
+            String::new()
+        } else {
+            format!("<p class=\"notes\">{}</p>", esc(&r["notes"].replace(" | ", " ")))
+        };
         c += &format!(
-            "<details><summary>Confirmed {} via {}{}</summary><ul>{}</ul></details>",
+            "<details><summary>Confirmed {} via {}{}</summary>{}<ul>{}</ul></details>",
             esc(if r["last_confirmed"].is_empty() { "never" } else { &r["last_confirmed"] }),
-            esc(if r["confirmed_by"].is_empty() { "unknown" } else { &r["confirmed_by"] }),
+            esc(&if r["confirmed_by"].is_empty() { "unknown".to_string() } else { r["confirmed_by"].replace(';', ", ") }),
             if stale { " (over 90 days)" } else { "" },
+            notes,
             srcs.join("")
         );
         c += "</article>";
@@ -160,6 +172,7 @@ main {{ padding:16px; display:grid; gap:12px; grid-template-columns:repeat(auto-
 .sales {{ border-top:1px dashed var(--line); margin-top:8px; padding-top:6px; }}
 .dnc {{ color:var(--warn); font-weight:600; }}
 details {{ font-size:13px; color:var(--muted); margin-top:8px; }} details ul {{ padding-left:18px; overflow-wrap:anywhere; }}
+  .notes {{ font-size:13px; color:var(--muted); }}
 footer {{ padding:0 16px 24px; color:var(--muted); font-size:13px; }}
 </style></head>
 <body><header><h1>Cullman law firms ({count})</h1><input id="q" type="search" placeholder="Filter by firm, attorney or practice" aria-label="Filter"></header>
